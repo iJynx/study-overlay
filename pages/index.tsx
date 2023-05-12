@@ -1,118 +1,226 @@
 import Image from 'next/image'
 import { Inter } from 'next/font/google'
-
+import { useEffect, useState } from 'react'
 const inter = Inter({ subsets: ['latin'] })
+import Head from 'next/head'
+import { useForm } from "react-hook-form";
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { fetchSpotifyAccessToken, refreshToken } from '../utils/spotify';
 
-export default function Home() {
+// anonymous async func
+
+export default function Home({ token, refreshTokenA }) {
+
+  const devHost = "http://localhost:3000/";
+  const prodHost = "https://study-overlay.vercel.app";
+
+  const { register, handleSubmit, watch, formState: { errors } } = useForm(
+    {
+      defaultValues: {
+        // if token exists then set default for type as spotfiy
+        type: token ? "spotify" : null
+      }
+    }
+  );
+
+  const type = watch("type");
+  const [link, setLink] = useState("");
+
+  useEffect(() => {
+    if (token) {
+      // generate and display link
+      const url = devHost + "spotify?token=" + token + "&refreshToken=" + refreshTokenA;
+      setLink(url);
+    }
+  }, [])
+
+
+
+  const onSubmit = data => {
+    console.log(data)
+
+    const { type, workingTime, restTime } = data;
+
+    const timeNow = new Date().getTime();
+
+    if (type === "pomodoro") {
+      const url = devHost + "pomodoro?workingTime=" + workingTime + "&restTime=" + restTime + "&startTime=" + timeNow;
+
+      setLink(url);
+    }
+    else if (type === "local") {
+      const url = devHost + "localTime";
+      
+      setLink(url);
+    }
+  }
+
+
+  const router = useRouter();
+
   return (
-    <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
-    >
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">pages/index.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <div className='bg-slate-900'>
+      <Head>
+        <title>Study Overlay</title>
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <div className=' overflow-y-auto min-w-screen flex flex-col min-h-screen pb-10'>
+        <div className='mx-auto pt-20 w-2/3'>
+          <h1 className='text-3xl text-white'>Welcome to the <span className='font-bold text-indigo-500'>Study Overlay.</span></h1>
+          <h3 className='text-gray-400'>an easy to use overlay that can be ported directly into OBS and other streaming software to add that special touch.</h3>
+          <div className='grid grid-cols-3 gap-3 pt-4'>
+            <div className='bg-white rounded-xl p-4 flex flex-col text-gray-500'>
+              <h1 className='text-xl text-black font-bold'>Pomodoro Timer</h1>
+              <h6>Add a simple but cute pomodoro timer to let others keep track of their studying with you!</h6>
+            </div>
+            <div className='bg-white rounded-xl p-4 flex flex-col text-gray-500'>
+              <h1 className='text-xl text-black font-bold'>Spotify Tracker</h1>
+              <h6>Let people listen see the songs you're listening to while studying.</h6>
+            </div>
+            <div className='bg-white rounded-xl p-4 flex flex-col text-gray-500'>
+              <h1 className='text-xl text-black font-bold'>Local Timer</h1>
+              <h6>Have your local time displayed.</h6>
+            </div>
+          </div>
+          <div>
+            <h1 className='text-3xl mt-10 font-bold mb-1'>Steps</h1>
+            <ul className='list-decimal'>
+              <li>Scroll down to link generator and select type of overlay</li>
+              <li>Complete details (if you selected pomodoro timer, then add how many minutes of work and how many minutes of rest)</li>
+              <li>Press generate link and copy the link</li>
+              <li>Open OBS and click "Add Source" (the plus button in the sources tab)</li>
+              <li>Select "Browser" -> Create New -> Ok</li>
+              <li>Then add the copied URL and change width to 1000 pixels and height to 200 pixels</li>
+              <li>Lastly, add the filter "Chroma Key" to the browser source (this will make the background transparent)</li>
+              <li>Enjoy</li>
+            </ul>
+          </div>
+          <div>
+            <h1 className='text-3xl mt-10 font-bold mb-1 text-indigo-500'><span className='text-white'>Link</span> Generator!</h1>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <div className="grid grid-cols-3 w-full gap-3 pb-4">
+                <div className="flex items-center pl-4 border border-gray-200 rounded flex-1">
+                  <input value="pomodoro" {...register("type", { required: "Please choose a site type" })} type="radio" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2" />
+                  <label className="w-full py-4 ml-2 text-sm font-medium text-gray-400"><span className="text-white font-bold">Pomodoro Timer</span> - cute little clock.</label>
+                </div>
+                <div className="flex items-center pl-4 border border-gray-200 rounded flex-1">
+                  <input value="spotify" {...register("type")} type="radio" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2" />
+                  <label className="w-full py-4 ml-2 text-sm font-medium text-gray-400"><span className="text-white font-bold">Spotify Tracker</span> - show your current songs.</label>
+                </div>
+                <div className="flex items-center pl-4 border border-gray-200 rounded flex-1">
+                  <input value="local" {...register("type")} type="radio" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2" />
+                  <label className="w-full py-4 ml-2 text-sm font-medium text-gray-400"><span className="text-white font-bold">Local time</span> - display local time.</label>
+                </div>
+              </div>
+
+              {
+                type === "pomodoro" &&
+                <div className="flex flex-col gap-2">
+                  <input {...register("workingTime", { required: "Choose a working time for your pomodoro timer." })} type="text" className="rounded bg-gray-100 border text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm border-gray-800 p-2.5 " placeholder="Work Time (minutes)" />
+                  <input {...register("restTime", { required: "Choose a resting time for your pomodoro timer." })} type="text" className="rounded bg-gray-100 border text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm border-gray-800 p-2.5 " placeholder="Rest Time (minutes)" />
+
+                </div>
+              }
+              {
+                type === "spotify" &&
+                <div className=" gap-2 flex">
+                  <button className='bg-green-400 rounded-xl text-white p-4 '
+                    onClick={
+                      () => {
+
+                        let params = new URLSearchParams({
+                          response_type: 'code',
+                          client_id: "fb31251099ec4a96a54f36d223ceb448",
+                          scope: "user-read-currently-playing",
+                          redirect_uri: "http://localhost:3000",
+                        });
+
+
+                        const url = `https://accounts.spotify.com/authorize?${params.toString()}`
+
+
+                        // go to it
+                        router.push(url)
+                      }
+                    }
+                  >
+                    Click here to login to spotify
+                  </button>
+                </div>
+              }
+              {
+                link &&
+                <div className='mt-4'>
+                  <h1 className='text-white font-bold'>Your link has been generated! Copy it from bellow.</h1>
+                  <div className='m bg-indigo-500 rounded-xl text-white p-4 break-words'>
+                    <Link href={link}>{link}</Link>
+
+                  </div>
+                </div>
+              }
+              <div className='flex flex-col text-red-500 font-bold py-4'>
+
+                {errors.workingTime && <span>Please add a working time</span>}
+                {errors.restTime && <span>Please add a rest time</span>}
+              </div>
+              <button type="submit" className="mt-4 w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" >
+                Generate Link
+              </button>
+
+            </form>
+          </div>
         </div>
       </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700/10 after:dark:from-sky-900 after:dark:via-[#0141ff]/40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Discover and deploy boilerplate example Next.js&nbsp;projects.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    </div>
   )
+}
+
+
+// server side props
+export async function getServerSideProps(context) {
+  // get params
+
+  // check if code param exists
+  const code = context.query.code
+  const access_token = context.query.access_token
+
+
+  if (code) {
+
+    const data = await fetchSpotifyAccessToken(code);
+
+
+    // go to /access
+
+    const accessToken = data.access_token;
+    const refreshToken = data.refresh_token;
+
+    // go to ?access_token=accessToken&refresh_token=refreshToken
+
+    context.res.writeHead(302, {
+      Location: `/?access_token=${accessToken}&refresh_token=${refreshToken}`
+    })
+    context.res.end();
+
+
+    return {
+      props: {},
+    };
+  }
+
+  if (access_token) {
+    return {
+      props: {
+        token: access_token,
+        refreshTokenA: context.query.refresh_token
+      },
+    };
+  }
+
+  return {
+    props: {
+
+    }
+  }
 }
