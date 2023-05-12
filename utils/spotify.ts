@@ -12,11 +12,15 @@ export async function fetchSpotifyAccessToken(code) {
     body: new URLSearchParams({
       grant_type: 'authorization_code',
       code: code,
-      redirect_uri: 'https://study-overlay.vercel.app',
+      redirect_uri: 'https://study-overlay.vercel.app/',
     }),
   });
 
+
+
   const data = await response.json();
+
+  console.log(data)
 
   return data;
 }
