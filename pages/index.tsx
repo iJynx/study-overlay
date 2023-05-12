@@ -12,7 +12,7 @@ import { fetchSpotifyAccessToken, refreshToken } from '../utils/spotify';
 
 export default function Home({ token, refreshTokenA }) {
 
-  const devHost = "http://localhost:3000/";
+  const devHost = "https://study-overlay.vercel.app/";
   const prodHost = "https://study-overlay.vercel.app";
 
   const { register, handleSubmit, watch, formState: { errors } } = useForm(
@@ -51,7 +51,7 @@ export default function Home({ token, refreshTokenA }) {
     }
     else if (type === "local") {
       const url = devHost + "localTime";
-      
+
       setLink(url);
     }
   }
@@ -60,7 +60,7 @@ export default function Home({ token, refreshTokenA }) {
   const router = useRouter();
 
   return (
-    <div className='bg-slate-900'>
+    <div className='bg-gray-900'>
       <Head>
         <title>Study Overlay</title>
         <link rel="icon" href="/favicon.ico" />
@@ -84,8 +84,16 @@ export default function Home({ token, refreshTokenA }) {
             </div>
           </div>
           <div>
-            <h1 className='text-3xl mt-10 font-bold mb-1'>Steps</h1>
+            <h1 className='my-6 text-xl'>
+              This project is independently managed and hosted by Stefan Ciutina. To show support follow me <Link className="text-indigo-500 font-bold" href="https://instagram.com/stfn.c">@stfn.c</Link>.
+            </h1>
+          </div>
+          <div className='text-gray-500'>
+            <h1 className='text-3xl mt-10 text-white font-bold mb-1'>Steps</h1>
             <ul className='list-decimal'>
+              <h1>(If you have already setup OBS skip to step 3)</h1>
+              <li>Download OBS and open it</li>
+              <li>Click add source (bottom left-ish area) and choose the camera option. Then press new and select your camera. You should see it pop up on the main screen now</li>
               <li>Scroll down to link generator and select type of overlay</li>
               <li>Complete details (if you selected pomodoro timer, then add how many minutes of work and how many minutes of rest)</li>
               <li>Press generate link and copy the link</li>
@@ -133,7 +141,7 @@ export default function Home({ token, refreshTokenA }) {
                           response_type: 'code',
                           client_id: "fb31251099ec4a96a54f36d223ceb448",
                           scope: "user-read-currently-playing",
-                          redirect_uri: "http://localhost:3000",
+                          redirect_uri: "https://study-overlay.vercel.app/",
                         });
 
 
