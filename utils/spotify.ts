@@ -2,7 +2,7 @@
 const clientID = 'fb31251099ec4a96a54f36d223ceb448';
 const clientSecret = 'b364349647334f70a1aeab6544eeb313';
 
-export async function fetchSpotifyAccessToken(code, host) {
+export async function fetchSpotifyAccessToken(code: string, host: string) {
   const response = await fetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
     headers: {
@@ -16,16 +16,13 @@ export async function fetchSpotifyAccessToken(code, host) {
     }),
   });
 
-
   const data = await response.json();
-
-  console.log(data)
 
   return data;
 }
 
 
-export async function refreshToken(refreshToken) {
+export async function refreshToken(refreshToken: string) {
   const response = await fetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
     headers: {
@@ -41,8 +38,5 @@ export async function refreshToken(refreshToken) {
 
   const data = await response.json();
 
-  console.log(('Authorization' + 'Basic ' + btoa(clientID + ':' + clientSecret)))
-
-  console.log("Refresh token data", JSON.stringify(data))
   return data;
 }

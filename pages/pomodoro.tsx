@@ -1,14 +1,6 @@
-import Image from 'next/image'
 import { Inter } from 'next/font/google'
 import { useEffect, useState } from 'react'
 const inter = Inter({ subsets: ['latin'] })
-import SpotifyWebApi from 'spotify-web-api-js';
-import { useRouter } from 'next/router';
-import axios from 'axios';
-// Authorization token that must have been created previously. See : https://developer.spotify.com/documentation/web-api/concepts/authorization
-import { fetchSpotifyAccessToken, refreshToken } from '../utils/spotify';
-
-// anonymous async func
 
 export default function Home({ workingTime, restTime, startTime }) {
   useEffect(() => {
@@ -48,6 +40,14 @@ export default function Home({ workingTime, restTime, startTime }) {
     return () => clearInterval(interval);
   }, [isWorking]);
 
+  if(!workingTime || !restTime) {
+    return (
+      <div>
+        <h1>Whoops, looks like there's some missing parameters! Go back to the main page to generate this link with proper parameters</h1>
+      </div>
+    )
+  }
+
   return (
     <div
       className={`w-full h-screen flex flex-grow bg-green-500 font-sans text-white`}
@@ -82,9 +82,5 @@ export async function getServerSideProps(context) {
     };
   }
 
-  return {
-    props: {
-
-    }
-  }
+  return { props: { } }
 }

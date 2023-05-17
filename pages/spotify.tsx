@@ -10,12 +10,12 @@ import { fetchSpotifyAccessToken, refreshToken } from '../utils/spotify';
 
 // anonymous async func
 
-export default function Home({ token, refreshTokenA, host }) {
+export default function Home({ token, refreshTokenString, host }: { token: string, refreshTokenString: string, host: string }) {
   async function fetchWebApi(endpoint, method, body) {
 
     // fetch from localstorage, print first 5 chars and then overwite existing token object
     let usedToken = localStorage.getItem('token') || token
-    console.log("token-------------:", usedToken.slice(0,5))
+    console.log("token-------------:", usedToken.slice(0, 5))
 
     if (!usedToken) {
       return;
@@ -45,99 +45,52 @@ export default function Home({ token, refreshTokenA, host }) {
   const [duration, setDuration] = useState(0)
   const [albumCover, setAlbumCover] = useState('')
 
-  const [stateToken, setStateToken] = useState(token)
-
-  const router = useRouter()
-
-  const printStateToken = () => {
-    console.log("stateToken-------------:", stateToken.slice(0,5))
-  }
-
-
-
   useEffect(() => {
 
     if (!token) {
       return;
     }
 
-    try {
-      // do every 5 seconds
-      const intervalID = setInterval(() => {
-        printStateToken()
-        getCurrentPlaying().then(currentPlaying => {
-          console.log(currentPlaying)
-          // select random number between 0 and 100
-          if (currentPlaying.error && currentPlaying.error.status === 401) {
-            console.log("-------------------")
-            console.log(token)
-            console.log(currentPlaying.error.message)
-            // cancel interval
-            // refresh token
-            refreshToken(refreshTokenA, host).then(data => {
-              setStateToken(data.access_token)
-              // router.push(`/spotify?token=${data.access_token}&refreshToken=${refreshTokenA}&host=${host}`)
-              // set to local storage
-              localStorage.setItem('token', data.access_token)
-            });
+    const intervalID = setInterval(() => {
+      getCurrentPlaying().then(currentPlaying => {
+        console.log(currentPlaying)
+        // select random number between 0 and 100
+        if (currentPlaying.error && currentPlaying.error.status === 401) {
+          console.log("-------------------")
+          console.log(token)
+          console.log(currentPlaying.error.message)
+          // cancel interval
+          // refresh token
+          refreshToken(refreshTokenString, host).then(data => {
+            localStorage.setItem('token', data.access_token)
+          });
 
 
-            return;
-          }
+          return;
+        }
 
+        if (!currentPlaying || !currentPlaying.item || !currentPlaying.item.name)
+          return;
 
-
-          setSongName(currentPlaying.item.name)
-          setArtistName(currentPlaying.item.artists[0].name)
-          setProgress(currentPlaying.progress_ms)
-          setActualProgress(currentPlaying.progress_ms)
-          setDuration(currentPlaying.item.duration_ms)
-          setAlbumCover(currentPlaying.item.album.images[0].url)
-        })
-      }, 1000)
-
-      return () => clearInterval(intervalID)
-
-    } catch (error) {
-    }
-  }, [])
-
-  // useEffect(() => {
-  //   if (progress && progress > 0) {
-  //     const currentProgress = progress;
-
-  //     let count = 0;
-  //     const interval = setInterval(() => {
-  //       if(count < 5) {
-  //         setActualProgress(currentProgress + 1000)
-  //         count++;
-  //       } else {
-  //         clearInterval(interval)
-  //       }
-  //     }, 1000)
-  //   }
-  // }, [progress])
-
-  // make center of page current minutes and seconds
-  const [currentDate, setCurrentDate] = useState(new Date("2021-01-01T00:00:00"))
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // set minutes and seconds
-      const newDate = new Date()
-      setCurrentDate(newDate)
-
+        setSongName(currentPlaying.item.name)
+        setArtistName(currentPlaying.item.artists[0].name)
+        setProgress(currentPlaying.progress_ms)
+        setActualProgress(currentPlaying.progress_ms)
+        setDuration(currentPlaying.item.duration_ms)
+        setAlbumCover(currentPlaying.item.album.images[0].url)
+      })
     }, 1000)
-    return () => clearInterval(interval)
-  }, [])
 
+    return () => clearInterval(intervalID)
+  }, [])
 
   if (!token) {
-    return (<div>
-
-      <h1>
-        token not found. you are not meant to access this link directly. use the link generator
-      </h1>
-    </div>)
+    return (
+      <div>
+        <h1>
+          token not found. you are not meant to access this link directly. use the link generator
+        </h1>
+      </div>)
   }
   return (
     <div
@@ -166,11 +119,6 @@ export default function Home({ token, refreshTokenA, host }) {
                   className={`rounded-lg h-full bg-gray-700`}>
                 </div>
               </div>
-              {/* 
-              <div className='h-[10px] w-[500px] bg-white rounded-[1rem] my-auto relative'>
-                <div className={`h-[10px] w-[402px] bg-blue-500 rounded-[1rem] absolute z-10`} ></div>
-              </div> */}
-
               <div className='text-[1.5rem] my-auto mx-6'>
                 {Math.floor(duration / 60000)}:{((duration / 1000) % 60).toFixed(0).toString().padStart(2, '0')}
               </div>
