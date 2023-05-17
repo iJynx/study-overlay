@@ -98,7 +98,7 @@ export default function Home({ host, token, refreshTokenA }) {
               <li>Select "Browser" -> Create New -> Ok</li>
               <li>Then add the copied URL and change width to 1000 pixels and height to 200 pixels</li>
               <li>Lastly, add the filter "Chroma Key" to the browser source (this will make the background transparent)</li>
-              <li>Enjoy</li>
+              <li>Enjoy!!</li>
             </ul>
           </div>
           <div>
