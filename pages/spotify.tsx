@@ -10,7 +10,7 @@ import { fetchSpotifyAccessToken, refreshToken } from '../utils/spotify';
 
 // anonymous async func
 
-export default function Home({ token, refreshTokenA }) {
+export default function Home({ token, refreshTokenA, host }) {
   async function fetchWebApi(endpoint, method, body) {
     if (!stateToken) {
       return;
@@ -57,7 +57,7 @@ export default function Home({ token, refreshTokenA }) {
           if (currentPlaying.error && currentPlaying.error.status === 401) {
             // cancel interval
             // refresh token
-            refreshToken(refreshTokenA).then(data => {
+            refreshToken(refreshTokenA, host).then(data => {
               setStateToken(data.access_token)
             })
             return;
@@ -164,15 +164,16 @@ export default function Home({ token, refreshTokenA }) {
 
 // server side props
 export async function getServerSideProps(context) {
-    // get params
-  
+    // get paramshost
+    const host = process.env.HOST
     const access_token = context.query.token
 
     if (access_token) {
       return {
         props: {
           token: access_token,
-          refreshTokenA: context.query.refreshToken
+          refreshTokenA: context.query.refreshToken,
+          host
         },
       };
     }

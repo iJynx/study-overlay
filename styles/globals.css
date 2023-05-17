@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-body { background-color: rgba(0, 0, 0, 0); margin: 0px auto; }
+/* body { background-color: rgba(0, 0, 0, 0); margin: 0px auto; } */
 
 :root {
   --foreground-rgb: 0, 0, 0;
@@ -26,4 +26,12 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+}
+
+* {
+  transition: all 0.5s ease-in-out;
+}
+
+.auto-resize-text {
+  font-size: calc(20vw);
 }

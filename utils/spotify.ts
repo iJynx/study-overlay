@@ -2,7 +2,7 @@
 const clientID = 'fb31251099ec4a96a54f36d223ceb448';
 const clientSecret = 'b364349647334f70a1aeab6544eeb313';
 
-export async function fetchSpotifyAccessToken(code) {
+export async function fetchSpotifyAccessToken(code, host) {
   const response = await fetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
     headers: {
@@ -12,7 +12,7 @@ export async function fetchSpotifyAccessToken(code) {
     body: new URLSearchParams({
       grant_type: 'authorization_code',
       code: code,
-      redirect_uri: 'https://study-overlay.vercel.app/',
+      redirect_uri: host,
     }),
   });
 

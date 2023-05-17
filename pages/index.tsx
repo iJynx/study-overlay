@@ -10,10 +10,7 @@ import { fetchSpotifyAccessToken, refreshToken } from '../utils/spotify';
 
 // anonymous async func
 
-export default function Home({ token, refreshTokenA }) {
-
-  const devHost = "https://study-overlay.vercel.app/";
-  const prodHost = "https://study-overlay.vercel.app";
+export default function Home({ host, token, refreshTokenA }) {
 
   const { register, handleSubmit, watch, formState: { errors } } = useForm(
     {
@@ -30,7 +27,7 @@ export default function Home({ token, refreshTokenA }) {
   useEffect(() => {
     if (token) {
       // generate and display link
-      const url = devHost + "spotify?token=" + token + "&refreshToken=" + refreshTokenA;
+      const url = host + "spotify?token=" + token + "&refreshToken=" + refreshTokenA;
       setLink(url);
     }
   }, [])
@@ -141,7 +138,7 @@ export default function Home({ token, refreshTokenA }) {
                           response_type: 'code',
                           client_id: "fb31251099ec4a96a54f36d223ceb448",
                           scope: "user-read-currently-playing",
-                          redirect_uri: "https://study-overlay.vercel.app/",
+                          redirect_uri: host,
                         });
 
 
@@ -189,6 +186,8 @@ export default function Home({ token, refreshTokenA }) {
 export async function getServerSideProps(context) {
   // get params
 
+  const host = process.env.HOST;
+
   // check if code param exists
   const code = context.query.code
   const access_token = context.query.access_token
@@ -196,7 +195,7 @@ export async function getServerSideProps(context) {
 
   if (code) {
 
-    const data = await fetchSpotifyAccessToken(code);
+    const data = await fetchSpotifyAccessToken(code, host);
 
 
     // go to /access
@@ -221,14 +220,15 @@ export async function getServerSideProps(context) {
     return {
       props: {
         token: access_token,
-        refreshTokenA: context.query.refresh_token
+        refreshTokenA: context.query.refresh_token,
+        host
       },
     };
   }
 
   return {
     props: {
-
+      host
     }
   }
 }
