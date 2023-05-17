@@ -7,6 +7,8 @@ import { useForm } from "react-hook-form";
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { fetchSpotifyAccessToken, refreshToken } from '../utils/spotify';
+import { NotificationContainer, NotificationManager } from 'react-notifications';
+import 'react-notifications/lib/notifications.css';
 
 // anonymous async func
 
@@ -33,6 +35,10 @@ export default function Home({ host, token, refreshTokenA }) {
   }, [])
 
 
+  const copyLink = () => {
+    navigator.clipboard.writeText(link);
+    NotificationManager.success('Link has been copied. You can now paste it in OBS!', 'Success! Woo!');
+  }
 
   const onSubmit = data => {
     console.log(data)
@@ -58,6 +64,8 @@ export default function Home({ host, token, refreshTokenA }) {
 
   return (
     <div className='bg-gray-900'>
+
+      <NotificationContainer />
       <Head>
         <title>Study Overlay</title>
         <link rel="icon" href="/favicon.ico" />
@@ -139,8 +147,15 @@ export default function Home({ host, token, refreshTokenA }) {
                 link &&
                 <div className='mt-4'>
                   <h1 className='text-white font-bold'>Your link has been generated! Copy it from bellow.</h1>
-                  <div className='m bg-indigo-500 rounded-xl text-white p-4 break-words'>
-                    <Link href={link}>{link}</Link>
+                  <div className='bg-indigo-500 rounded-xl text-white p-4 gap-4 flex'>
+                    <div className='min-w-[50px] p-1 flex flex-col'>
+                      <svg onClick={copyLink} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="hover:cursor-pointer lucide lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
+                      <h1 className="text-gray-200 mx-auto text-sm">(copy)</h1>
+                    </div>
+                    <div className='flex-1 break-all flex'>
+
+                      <Link className="my-auto" href={link}>{link}</Link>
+                    </div>
 
                   </div>
                 </div>
@@ -161,7 +176,7 @@ export default function Home({ host, token, refreshTokenA }) {
               {
                 type === "spotify" &&
                 <div className=" gap-2 flex">
-                <button type="submit" className={`${!type ? "hover:cursor-not-allowed" : "test"} mt-4 w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`} 
+                  <button type="submit" className={`${!type ? "hover:cursor-not-allowed" : "test"} mt-4 w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
                     onClick={
                       () => {
 
