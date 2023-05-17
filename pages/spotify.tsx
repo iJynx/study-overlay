@@ -62,6 +62,7 @@ export default function Home({ token, refreshTokenString, host }: { token: strin
           // cancel interval
           // refresh token
           refreshToken(refreshTokenString, host).then(data => {
+            console.log("data", data)
             localStorage.setItem('token', data.access_token)
           });
 

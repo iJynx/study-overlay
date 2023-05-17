@@ -196,7 +196,7 @@ export default function Home({ host, token, refreshTokenA }) {
                       }
                     }
                   >
-                    Click here to login to spotify
+                    Click here to login to spotify (only works for people with spotify premium for now)
                   </button>
                 </div>
               }
