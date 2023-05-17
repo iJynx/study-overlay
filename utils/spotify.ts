@@ -17,7 +17,6 @@ export async function fetchSpotifyAccessToken(code, host) {
   });
 
 
-
   const data = await response.json();
 
   console.log(data)
@@ -39,7 +38,11 @@ export async function refreshToken(refreshToken) {
     }),
   });
 
+
   const data = await response.json();
 
+  console.log(('Authorization' + 'Basic ' + btoa(clientID + ':' + clientSecret)))
+
+  console.log("Refresh token data", JSON.stringify(data))
   return data;
 }

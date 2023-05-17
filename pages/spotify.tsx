@@ -12,12 +12,17 @@ import { fetchSpotifyAccessToken, refreshToken } from '../utils/spotify';
 
 export default function Home({ token, refreshTokenA, host }) {
   async function fetchWebApi(endpoint, method, body) {
-    if (!stateToken) {
+
+    // fetch from localstorage, print first 5 chars and then overwite existing token object
+    let usedToken = localStorage.getItem('token') || token
+    console.log("token-------------:", usedToken.slice(0,5))
+
+    if (!usedToken) {
       return;
     }
     const res = await fetch(`https://api.spotify.com/${endpoint}`, {
       headers: {
-        Authorization: `Bearer ${stateToken}`,
+        Authorization: `Bearer ${usedToken}`,
       },
       method,
       body: JSON.stringify(body)
@@ -40,7 +45,15 @@ export default function Home({ token, refreshTokenA, host }) {
   const [duration, setDuration] = useState(0)
   const [albumCover, setAlbumCover] = useState('')
 
-  let [stateToken, setStateToken] = useState(token)
+  const [stateToken, setStateToken] = useState(token)
+
+  const router = useRouter()
+
+  const printStateToken = () => {
+    console.log("stateToken-------------:", stateToken.slice(0,5))
+  }
+
+
 
   useEffect(() => {
 
@@ -50,16 +63,25 @@ export default function Home({ token, refreshTokenA, host }) {
 
     try {
       // do every 5 seconds
-      let a = setInterval(() => {
-        console.log("checking")
+      const intervalID = setInterval(() => {
+        printStateToken()
         getCurrentPlaying().then(currentPlaying => {
-
+          console.log(currentPlaying)
+          // select random number between 0 and 100
           if (currentPlaying.error && currentPlaying.error.status === 401) {
+            console.log("-------------------")
+            console.log(token)
+            console.log(currentPlaying.error.message)
             // cancel interval
             // refresh token
             refreshToken(refreshTokenA, host).then(data => {
               setStateToken(data.access_token)
-            })
+              // router.push(`/spotify?token=${data.access_token}&refreshToken=${refreshTokenA}&host=${host}`)
+              // set to local storage
+              localStorage.setItem('token', data.access_token)
+            });
+
+
             return;
           }
 
@@ -73,6 +95,9 @@ export default function Home({ token, refreshTokenA, host }) {
           setAlbumCover(currentPlaying.item.album.images[0].url)
         })
       }, 1000)
+
+      return () => clearInterval(intervalID)
+
     } catch (error) {
     }
   }, [])
@@ -122,7 +147,7 @@ export default function Home({ token, refreshTokenA, host }) {
         <div className='flex p-2 '>
 
           <div className='h-[100px] w-[100px]'>
-            <Image src={albumCover} width={500} height={500} className="rounded-[1rem]" />
+            <Image src={albumCover} width={500} height={500} className="rounded-[1rem]" alt="Album Cover" />
           </div>
           <div className='flex flex-col -mt-4'>
 
@@ -164,24 +189,23 @@ export default function Home({ token, refreshTokenA, host }) {
 
 // server side props
 export async function getServerSideProps(context) {
-    // get paramshost
-    const host = process.env.HOST
-    const access_token = context.query.token
+  // get paramshost
+  const host = process.env.HOST
+  const access_token = context.query.token
 
-    if (access_token) {
-      return {
-        props: {
-          token: access_token,
-          refreshTokenA: context.query.refreshToken,
-          host
-        },
-      };
-    }
-  
+  if (access_token) {
     return {
       props: {
-  
-      }
+        token: access_token,
+        refreshTokenA: context.query.refreshToken,
+        host
+      },
+    };
+  }
+
+  return {
+    props: {
+
     }
   }
-  
+}
