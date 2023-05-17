@@ -58,7 +58,7 @@ export default function Home({ workingTime, restTime, startTime }) {
           {isWorking ? '📚' : 'Break'} {Math.floor(timeLeft / 60000)}m {((timeLeft / 1000) % 60).toFixed(0)}s
         </h1>
         <h1 className='text-[1.9rem] mx-auto'>
-          Pomodoro timer (50/10)
+          Pomodoro timer ({Math.floor(workingTime)}/{Math.floor(restTime)})
         </h1>
       </div>
     </div>

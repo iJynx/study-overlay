@@ -42,12 +42,12 @@ export default function Home({ host, token, refreshTokenA }) {
     const timeNow = new Date().getTime();
 
     if (type === "pomodoro") {
-      const url = devHost + "pomodoro?workingTime=" + workingTime + "&restTime=" + restTime + "&startTime=" + timeNow;
+      const url = host + "pomodoro?workingTime=" + workingTime + "&restTime=" + restTime + "&startTime=" + timeNow;
 
       setLink(url);
     }
     else if (type === "local") {
-      const url = devHost + "localTime";
+      const url = host + "localTime";
 
       setLink(url);
     }
@@ -127,10 +127,41 @@ export default function Home({ host, token, refreshTokenA }) {
 
                 </div>
               }
+
+              {!type &&
+                <div className='rounded-xl p-10 my-4 w-full h-full border-8 border-solid border-indigo-500'>
+                  <h1>
+                    Chose one of the above options to see more details.
+                  </h1>
+                </div>
+              }
+              {
+                link &&
+                <div className='mt-4'>
+                  <h1 className='text-white font-bold'>Your link has been generated! Copy it from bellow.</h1>
+                  <div className='m bg-indigo-500 rounded-xl text-white p-4 break-words'>
+                    <Link href={link}>{link}</Link>
+
+                  </div>
+                </div>
+              }
+              <div className='flex flex-col text-red-500 font-bold py-4'>
+
+                {errors.workingTime && <span>Please add a working time</span>}
+                {errors.restTime && <span>Please add a rest time</span>}
+              </div>
+              {
+                type !== "spotify" &&
+                <button type="submit" className={`${!type ? "hover:cursor-not-allowed" : "test"} mt-4 w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`} >
+                  Generate Link {!type && <span className='ml-2'>(select an option first)</span>}
+                </button>
+              }
+
+
               {
                 type === "spotify" &&
                 <div className=" gap-2 flex">
-                  <button className='bg-green-400 rounded-xl text-white p-4 '
+                <button type="submit" className={`${!type ? "hover:cursor-not-allowed" : "test"} mt-4 w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`} 
                     onClick={
                       () => {
 
@@ -154,24 +185,6 @@ export default function Home({ host, token, refreshTokenA }) {
                   </button>
                 </div>
               }
-              {
-                link &&
-                <div className='mt-4'>
-                  <h1 className='text-white font-bold'>Your link has been generated! Copy it from bellow.</h1>
-                  <div className='m bg-indigo-500 rounded-xl text-white p-4 break-words'>
-                    <Link href={link}>{link}</Link>
-
-                  </div>
-                </div>
-              }
-              <div className='flex flex-col text-red-500 font-bold py-4'>
-
-                {errors.workingTime && <span>Please add a working time</span>}
-                {errors.restTime && <span>Please add a rest time</span>}
-              </div>
-              <button type="submit" className="mt-4 w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" >
-                Generate Link
-              </button>
 
             </form>
           </div>
