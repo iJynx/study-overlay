@@ -14,8 +14,7 @@ export default function Home({ token, refreshTokenString, host }: { token: strin
   async function fetchWebApi(endpoint, method, body) {
 
     // fetch from localstorage, print first 5 chars and then overwite existing token object
-    let usedToken = localStorage.getItem('token') || token
-    console.log("token-------------:", usedToken.slice(0, 5))
+    let usedToken = (localStorage.getItem('token') && localStorage.getItem('token') != "undefined") ? localStorage.getItem('token') : token
 
     if (!usedToken) {
       return;
